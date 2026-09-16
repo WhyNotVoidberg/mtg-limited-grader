@@ -1,0 +1,9 @@
+{
+  "name": "MTG Limited Grader",
+  "short_name": "Limited Grader",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#101010",
+  "theme_color": "#171717",
+  "description": "Mobile-first Magic: The Gathering Limited card grading workspace."
+}

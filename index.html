@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#171717">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Limited Grader">
+  <title>MTG Limited Grader</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<header>
+  <div>
+    <h1>MTG Limited Grader</h1>
+    <div id="subtitle">Sets</div>
+  </div>
+  <button id="homeBtn" class="ghost hidden">Sets</button>
+</header>
+
+<main>
+  <section id="setsView">
+    <div class="hero">
+      <h2>Your Limited sets</h2>
+      <p>Grade independently first. Expert and 17Lands data can be added later.</p>
+    </div>
+    <div id="setCards" class="set-grid"></div>
+    <div class="panel add-set">
+      <h3>Add another set</h3>
+      <div class="row">
+        <input id="setCodeInput" maxlength="8" placeholder="Set code, e.g. DSK">
+        <button id="addSetBtn">Add set</button>
+      </div>
+      <p class="muted">Cards are loaded from Scryfall. Your grades and notes stay in this browser unless you export them.</p>
+    </div>
+  </section>
+
+  <section id="setView" class="hidden">
+    <nav class="tabs">
+      <button data-tab="gallery" class="active">Gallery</button>
+      <button data-tab="grader">Grade</button>
+      <button data-tab="mechanics">Mechanics</button>
+      <button data-tab="data">Data</button>
+    </nav>
+
+    <div id="galleryTab" class="tab">
+      <div class="toolbar">
+        <select id="colorFilter">
+          <option value="">All colors</option><option>W</option><option>U</option><option>B</option><option>R</option><option>G</option><option value="M">Multicolor</option><option value="C">Colorless</option><option value="L">Land</option>
+        </select>
+        <select id="rarityFilter">
+          <option value="">All rarities</option><option value="common">Common</option><option value="uncommon">Uncommon</option><option value="rare">Rare</option><option value="mythic">Mythic</option>
+        </select>
+        <select id="statusFilter">
+          <option value="">All cards</option><option value="graded">Graded</option><option value="ungraded">Ungraded</option>
+        </select>
+      </div>
+      <div id="gallery" class="gallery"></div>
+    </div>
+
+    <div id="graderTab" class="tab hidden">
+      <div class="grader">
+        <div class="card-pane">
+          <img id="cardImage" alt="Magic card">
+          <div id="cardFallback" class="card-fallback hidden"></div>
+        </div>
+        <div class="form-pane">
+          <div class="card-heading">
+            <div><h2 id="cardName"></h2><div id="cardMeta" class="muted"></div></div>
+            <span id="progressBadge" class="badge"></span>
+          </div>
+
+          <label>Grade
+            <select id="grade"></select>
+          </label>
+          <label>Confidence
+            <select id="confidence"><option value=""></option><option>High</option><option>Medium</option><option>Low</option></select>
+          </label>
+          <label>Primary role
+            <select id="primaryRole"></select>
+          </label>
+
+          <div>
+            <div class="field-title">Secondary tags</div>
+            <div id="secondaryTags" class="chips"></div>
+          </div>
+          <div>
+            <div class="field-title">Synergy tags</div>
+            <div id="synergyTags" class="chips"></div>
+          </div>
+
+          <div class="scores">
+            <label>Power <input id="power" type="number" min="1" max="10" inputmode="numeric"></label>
+            <label>Consistency <input id="consistency" type="number" min="1" max="10" inputmode="numeric"></label>
+            <label>Flexibility <input id="flexibility" type="number" min="1" max="10" inputmode="numeric"></label>
+            <label>Synergy reliance <input id="synergyReliance" type="number" min="1" max="10" inputmode="numeric"></label>
+          </div>
+
+          <label>Current / pre-release thoughts
+            <textarea id="notes" rows="6" placeholder="What makes the card good or bad? Where does it belong?"></textarea>
+          </label>
+        </div>
+      </div>
+      <div class="grader-nav">
+        <button id="prevBtn" class="ghost">← Previous</button>
+        <button id="saveNextBtn">Save & next →</button>
+      </div>
+    </div>
+
+    <div id="mechanicsTab" class="tab hidden">
+      <div class="panel">
+        <h2>Set mechanics</h2>
+        <p class="muted">Rate mechanics separately from individual cards. DSK starts with its major Limited mechanics.</p>
+        <div id="mechanicsList"></div>
+      </div>
+    </div>
+
+    <div id="dataTab" class="tab hidden">
+      <div class="panel">
+        <h2>Project data</h2>
+        <p id="dataSummary"></p>
+        <div class="button-stack">
+          <button id="exportJson">Export backup (.json)</button>
+          <button id="exportCsv" class="ghost">Export card ratings (.csv)</button>
+          <label class="file-button">Import backup<input id="importJson" type="file" accept=".json,application/json"></label>
+        </div>
+        <p class="muted">17Lands history and expert comparisons will be added here after the grading workflow is validated. The data model already keeps each set separate.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="./app.js"></script>
+</body>
+</html>
