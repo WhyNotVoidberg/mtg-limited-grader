@@ -20,3 +20,25 @@ input,select,textarea{width:100%;background:#242427;color:#f4f4f5;border:1px sol
 .mechanic{border-top:1px solid var(--line);padding:14px 0}.mechanic:first-child{border-top:0}.mechanic-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.button-stack{display:grid;gap:10px;max-width:420px}.file-button{text-align:center}.file-button input{display:none}
 @media(min-width:700px){.gallery{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:699px){.grader{display:block}.card-pane{position:static;max-width:390px;margin:0 auto 18px}.tabs{top:72px}.toolbar{grid-template-columns:1fr}.scores{grid-template-columns:repeat(2,1fr)}.form-pane{padding-bottom:18px}}
+
+/* v1.2 mobile grading */
+.card-pane{align-self:start}
+.card-pane img{max-height:46vh;width:auto;max-width:100%;margin:0 auto;display:block;cursor:zoom-in}
+.score-block{margin:14px 0}
+.scale-five,.synergy-scale{display:grid;gap:5px}
+.scale-five{grid-template-columns:repeat(5,1fr)}
+.synergy-scale{grid-template-columns:repeat(4,1fr)}
+.scale-btn,.mini-scale{background:#242427;color:#c7c7cc;border:1px solid #3b3b40;padding:8px 4px;font-weight:600}
+.scale-btn span{display:block;font-size:10px;line-height:1.15;margin-top:3px}.scale-btn strong{font-size:15px}
+.scale-btn.on,.mini-scale.on{background:#4a4025;color:#ffe69a;border-color:#8b7638}
+.mech-row{margin:12px 0}.mechanic-scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.mini-scale{font-size:15px}
+.image-modal{position:fixed;inset:0;z-index:100;background:#000e;display:flex;align-items:center;justify-content:center;padding:55px 12px 20px}
+.image-modal img{max-width:96vw;max-height:88vh;border-radius:4.7%}.image-close{position:absolute;top:calc(10px + env(safe-area-inset-top));right:12px}
+@media(max-width:700px){
+  .grader{display:block}
+  .card-pane{position:sticky;top:116px;z-index:8;pointer-events:none;margin:0 auto 8px;width:max-content;max-width:100%}
+  .card-pane img{pointer-events:auto;max-height:34vh;box-shadow:0 8px 22px #0008}
+  .card-fallback{pointer-events:auto}
+  .form-pane{position:relative;z-index:9;background:#101010;padding-top:8px}
+  .scale-btn{min-width:0;padding:8px 2px}.scale-btn span{font-size:9px}
+}

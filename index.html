@@ -63,7 +63,7 @@
     <div id="graderTab" class="tab hidden">
       <div class="grader">
         <div class="card-pane">
-          <img id="cardImage" alt="Magic card">
+          <img id="cardImage" alt="Magic card" title="Tap to enlarge">
           <div id="cardFallback" class="card-fallback hidden"></div>
         </div>
         <div class="form-pane">
@@ -91,11 +91,17 @@
             <div id="synergyTags" class="chips"></div>
           </div>
 
-          <div class="scores">
-            <label>Power <input id="power" type="number" min="1" max="10" inputmode="numeric"></label>
-            <label>Consistency <input id="consistency" type="number" min="1" max="10" inputmode="numeric"></label>
-            <label>Flexibility <input id="flexibility" type="number" min="1" max="10" inputmode="numeric"></label>
-            <label>Synergy reliance <input id="synergyReliance" type="number" min="1" max="10" inputmode="numeric"></label>
+          <div class="score-block">
+            <div class="field-title">Power <span class="muted">relative to this grade</span></div>
+            <div id="power" class="scale-five" data-value="3"></div>
+          </div>
+          <div class="score-block">
+            <div class="field-title">Consistency <span class="muted">relative to this grade</span></div>
+            <div id="consistency" class="scale-five" data-value="3"></div>
+          </div>
+          <div class="score-block">
+            <div class="field-title">Synergy reliance</div>
+            <div id="synergyReliance" class="synergy-scale"></div>
           </div>
 
           <label>Current / pre-release thoughts
@@ -131,6 +137,10 @@
     </div>
   </section>
 </main>
+<div id="imageModal" class="image-modal hidden" role="dialog" aria-label="Card image">
+  <button id="closeImage" class="image-close" type="button">Close</button>
+  <img id="modalCardImage" alt="Enlarged Magic card">
+</div>
 
 <script src="./app.js"></script>
 </body>
