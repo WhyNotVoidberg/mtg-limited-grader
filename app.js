@@ -1,13 +1,32 @@
 
-const GRADES=["","A+","A","A-","B+","B","B-","C+","C","C-","D+","D","D-","F+","F","F-"];
+const GRADES=["","A+","A","A-","B+","B","B-","C+","C","C-","D+","D","D-","F"];
 const ROLES=["","Creature","Removal","Combat Trick","Card Advantage","Interaction","Ramp","Mana/Fixing","Recursion","Build-Around","Payoff","Other"];
 const SECONDARY=["Evasion","Burn","Cantrip","Card Selection","Modal","Token Maker","Value","ETB","Death Trigger","Sacrifice Outlet","Graveyard Filler","Finisher","Defensive","Aggressive","Tempo","Protection"];
 const SYNERGY=["Artifacts","Enchantments","Rooms","Eerie","Manifest Dread","Face-Down","Delirium","Survival","Graveyard","Reanimator","Tokens","+1/+1 Counters","Sacrifice","Lifegain","Discard","Go-Wide","Go-Tall","Power 2 or Less","Aggro","Control","Tempo"];
 const DSK_MECHANICS=["Rooms","Manifest Dread","Survival","Eerie","Impending","Delirium"];
+const APP_VERSION="1.3";
 const state=loadState();
 let currentSet=null,currentCards=[],currentIndex=0;
 
 function loadState(){try{return JSON.parse(localStorage.getItem("mtgLimitedGraderV1"))||{sets:{}}}catch{return {sets:{}}}}
+function migrateState(){
+  const toFive=v=>{const n=Number(v);if(!Number.isFinite(n)||n<1)return v;return String(Math.max(1,Math.min(5,Math.ceil(n/2))))};
+  Object.values(state.sets||{}).forEach(s=>{
+    Object.values(s.ratings||{}).forEach(d=>{
+      if(d.grade==="F+"||d.grade==="F-")d.grade="F";
+      if(Number(d.power)>5)d.power=toFive(d.power);
+      if(Number(d.consistency)>5)d.consistency=toFive(d.consistency);
+      if(/^\d+$/.test(String(d.synergyReliance||""))){
+        const n=Number(d.synergyReliance);d.synergyReliance=n>=8?"Dependent":n>=4?"Assisted":"Independent";
+      }
+    });
+    const mech=Object.values(s.mechanics||{});
+    const keys=["Power","Fun to play","Fun to play against","Synergy reliance","Desire to return","Likelihood to return"];
+    const legacy=mech.some(d=>keys.some(k=>Number(d[k])>5));
+    if(legacy)mech.forEach(d=>keys.forEach(k=>{if(d[k]!==undefined&&d[k]!=="")d[k]=toFive(d[k])}));
+  });
+}
+
 function persist(){localStorage.setItem("mtgLimitedGraderV1",JSON.stringify(state))}
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 function cardKey(c){return c.oracle_id||c.id}
@@ -161,6 +180,7 @@ function renderCard(){
   renderFiveScale("power",d.power);renderFiveScale("consistency",d.consistency);renderSynergyScale(d.synergyReliance);
   document.querySelectorAll("#secondaryTags .chip").forEach(b=>b.classList.toggle("on",(d.secondary||[]).includes(b.textContent)));
   document.querySelectorAll("#synergyTags .chip").forEach(b=>b.classList.toggle("on",(d.synergy||[]).includes(b.textContent)));
+  document.querySelector("#graderTab .card-pane")?.classList.remove("compact");
   window.scrollTo({top:0,behavior:"instant"});
 }
 function saveCurrent(){
@@ -170,6 +190,13 @@ function saveCurrent(){
   d.consistency=document.getElementById("consistency")?.dataset.value||d.consistency||"3";
   d.synergyReliance=document.getElementById("synergyReliance")?.dataset.value||d.synergyReliance||"Independent";
   persist()
+}
+function updateCardImageCompact(){
+  const pane=document.querySelector("#graderTab .card-pane");
+  const tab=document.getElementById("graderTab");
+  if(!pane||!tab||tab.classList.contains("hidden"))return;
+  const compact=window.scrollY>150;
+  pane.classList.toggle("compact",compact);
 }
 function move(n){saveCurrent();currentIndex=Math.max(0,Math.min(currentCards.length-1,currentIndex+n));renderCard();renderGallery()}
 function renderMechanics(){
@@ -193,12 +220,13 @@ function download(name,text,type){let a=document.createElement("a");a.href=URL.c
 function exportJSON(){download(`mtg-limited-grader-backup-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(state,null,2),"application/json")}
 function csvCell(v){return `"${String(v??"").replaceAll('"','""')}"`}
 function exportCSV(){
-  let s=state.sets[currentSet],rows=[["Set","Card","Color","Rarity","Mana Cost","Type","Grade","Confidence","Primary Role","Secondary Tags","Synergy Tags","Power","Consistency","Flexibility","Synergy Reliance","Notes"]];
-  s.cards.forEach(c=>{let d=s.ratings[cardKey(c)]||{};rows.push([currentSet.toUpperCase(),c.name,cardColor(c),c.rarity,c.mana_cost,c.type_line,d.grade,d.confidence,d.primaryRole,(d.secondary||[]).join("; "),(d.synergy||[]).join("; "),d.power,d.consistency,d.flexibility,d.synergyReliance,d.notes])});
+  let s=state.sets[currentSet],rows=[["Set","Card","Color","Rarity","Mana Cost","Type","Grade","Confidence","Primary Role","Secondary Tags","Synergy Tags","Power","Consistency","Synergy Reliance","Notes"]];
+  s.cards.forEach(c=>{let d=s.ratings[cardKey(c)]||{};rows.push([currentSet.toUpperCase(),c.name,cardColor(c),c.rarity,c.mana_cost,c.type_line,d.grade,d.confidence,d.primaryRole,(d.secondary||[]).join("; "),(d.synergy||[]).join("; "),d.power,d.consistency,d.synergyReliance,d.notes])});
   download(`${currentSet}-ratings.csv`,rows.map(r=>r.map(csvCell).join(",")).join("\n"),"text/csv")
 }
 async function importJSON(file){try{let j=JSON.parse(await file.text());if(!j.sets)throw Error();Object.assign(state,j);persist();renderSets();alert("Backup imported.")}catch{alert("That backup file could not be read.")}}
 
+migrateState();persist();
 buildSelect("grade",GRADES);buildSelect("primaryRole",ROLES);buildChips("secondaryTags",SECONDARY,"secondary");buildChips("synergyTags",SYNERGY,"synergy");
 document.getElementById("addSetBtn").onclick=()=>addSet(document.getElementById("setCodeInput").value);
 document.getElementById("homeBtn").onclick=showSets;
@@ -208,7 +236,16 @@ document.getElementById("prevBtn").onclick=()=>move(-1);document.getElementById(
 document.getElementById("exportJson").onclick=exportJSON;document.getElementById("exportCsv").onclick=exportCSV;
 document.getElementById("importJson").onchange=e=>e.target.files[0]&&importJSON(e.target.files[0]);
 window.addEventListener("beforeunload",saveCurrent);
-if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js");
+window.addEventListener("scroll",updateCardImageCompact,{passive:true});
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("./sw.js?v=1.3").then(reg=>{
+    reg.update();
+    setInterval(()=>reg.update(),60*60*1000);
+  }).catch(()=>{});
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{
+    if(!sessionStorage.getItem("swReloaded13")){sessionStorage.setItem("swReloaded13","1");location.reload()}
+  });
+}
 renderSets();
 if(!state.sets.dsk) addSet("dsk");
 

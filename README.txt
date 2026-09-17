@@ -14,3 +14,6 @@ Ratings are saved in local browser storage. Use Data > Export backup regularly.
 
 
 v1.2: mobile tap scoring, automatic role/tags, four-state synergy reliance, smaller sticky/tappable card image, 1-5 mechanics scoring, and tag data-loss fix.
+
+
+v1.3 stabilization: visible version badge, reliable network-first updates with old-cache cleanup, F+/F- removed and migrated to F, verified 1-5 mechanic buttons, and true shrink-on-scroll sticky card reference.
