@@ -1,3 +1,7 @@
+MTG Limited Grader v1.4
+
+Changes: Reality Fracture/new-set import fallback; clearer Scryfall errors; preserves v1.3 cache/update behavior.
+
 MTG Limited Grader v1
 
 GitHub Pages setup:

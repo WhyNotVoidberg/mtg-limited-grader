@@ -4,7 +4,7 @@ const ROLES=["","Creature","Removal","Combat Trick","Card Advantage","Interactio
 const SECONDARY=["Evasion","Burn","Cantrip","Card Selection","Modal","Token Maker","Value","ETB","Death Trigger","Sacrifice Outlet","Graveyard Filler","Finisher","Defensive","Aggressive","Tempo","Protection"];
 const SYNERGY=["Artifacts","Enchantments","Rooms","Eerie","Manifest Dread","Face-Down","Delirium","Survival","Graveyard","Reanimator","Tokens","+1/+1 Counters","Sacrifice","Lifegain","Discard","Go-Wide","Go-Tall","Power 2 or Less","Aggro","Control","Tempo"];
 const DSK_MECHANICS=["Rooms","Manifest Dread","Survival","Eerie","Impending","Delirium"];
-const APP_VERSION="1.3";
+const APP_VERSION="1.4";
 const state=loadState();
 let currentSet=null,currentCards=[],currentIndex=0;
 
@@ -97,13 +97,42 @@ function sortRank(c){
 }
 function compareCards(a,b){let A=sortRank(a),B=sortRank(b);for(let i=0;i<A.length;i++){if(A[i]<B[i])return-1;if(A[i]>B[i])return 1}return 0}
 
-async function fetchSet(code){
-  let url=`https://api.scryfall.com/cards/search?q=${encodeURIComponent(`set:${code} is:booster`)}&unique=cards&order=set`;
+async function scryfallSearch(query){
+  let url=`https://api.scryfall.com/cards/search?q=${encodeURIComponent(query)}&unique=cards&order=set`;
   let cards=[];
-  while(url){let r=await fetch(url); if(!r.ok)throw new Error("Set not found or Scryfall unavailable."); let j=await r.json(); cards.push(...j.data); url=j.has_more?j.next_page:null}
+  while(url){
+    const r=await fetch(url,{headers:{Accept:"application/json"}});
+    const j=await r.json().catch(()=>null);
+    if(!r.ok){
+      const detail=j?.details||`Scryfall returned HTTP ${r.status}.`;
+      const err=new Error(detail);err.status=r.status;throw err;
+    }
+    cards.push(...(j.data||[]));
+    url=j.has_more?j.next_page:null;
+  }
+  return cards;
+}
+async function fetchSet(code){
+  // Prefer Scryfall's booster flag. Newly previewed/unreleased sets can lag behind
+  // on that flag, so fall back to the full paper set rather than rejecting it.
+  let cards=[];
+  let boosterError=null;
+  try{cards=await scryfallSearch(`set:${code} is:booster`)}catch(e){boosterError=e}
+  if(!cards.length){
+    try{cards=await scryfallSearch(`set:${code} game:paper`)}catch(e){
+      if(e.status===404)throw new Error(`No Scryfall cards found for set code ${code.toUpperCase()}.`);
+      throw new Error(`Scryfall could not load ${code.toUpperCase()}: ${e.message}`);
+    }
+  }
   const seen=new Set();
-  cards=cards.filter(c=>{let k=c.oracle_id||c.name;if(seen.has(k))return false;seen.add(k);return true}).sort(compareCards);
-  if(!cards.length)throw new Error("No booster cards found.");
+  cards=cards.filter(c=>{
+    if(c.object!=="card"||c.digital)return false;
+    let k=c.oracle_id||c.name;if(seen.has(k))return false;seen.add(k);return true;
+  }).sort(compareCards);
+  if(!cards.length){
+    const why=boosterError?.message?` (${boosterError.message})`:"";
+    throw new Error(`No paper cards found for ${code.toUpperCase()}${why}`);
+  }
   return cards;
 }
 async function addSet(code){
@@ -238,12 +267,12 @@ document.getElementById("importJson").onchange=e=>e.target.files[0]&&importJSON(
 window.addEventListener("beforeunload",saveCurrent);
 window.addEventListener("scroll",updateCardImageCompact,{passive:true});
 if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("./sw.js?v=1.3").then(reg=>{
+  navigator.serviceWorker.register("./sw.js?v=1.4").then(reg=>{
     reg.update();
     setInterval(()=>reg.update(),60*60*1000);
   }).catch(()=>{});
   navigator.serviceWorker.addEventListener("controllerchange",()=>{
-    if(!sessionStorage.getItem("swReloaded13")){sessionStorage.setItem("swReloaded13","1");location.reload()}
+    if(!sessionStorage.getItem("swReloaded14")){sessionStorage.setItem("swReloaded14","1");location.reload()}
   });
 }
 renderSets();
