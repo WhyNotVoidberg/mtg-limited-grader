@@ -1,0 +1,8 @@
+node_modules/
+.private/
+test-results/
+*-backup-*.json
+mtg-limited-grader-before-import.json
+*_LOCKED_*.json
+*.xlsx
+*.zip

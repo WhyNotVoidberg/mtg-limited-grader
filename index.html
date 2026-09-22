@@ -8,8 +8,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Limited Grader">
   <title>MTG Limited Grader</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=1.4">
-  <link rel="stylesheet" href="./styles.css?v=1.4">
+  <link rel="manifest" href="./manifest.webmanifest?v=1.5">
+  <link rel="stylesheet" href="./styles.css?v=1.5">
 </head>
 <body>
 <header>
@@ -21,6 +21,7 @@
 </header>
 
 <main>
+  <p id="storageStatus" class="panel hidden" role="alert"></p>
   <section id="setsView">
     <div class="hero">
       <h2>Your Limited sets</h2>
@@ -125,14 +126,21 @@
 
     <div id="dataTab" class="tab hidden">
       <div class="panel">
-        <h2>Project data <span id="appVersion" class="version-badge">v1.4</span></h2>
+        <h2>Project data <span id="appVersion" class="version-badge">v1.5</span></h2>
         <p id="dataSummary"></p>
         <div class="button-stack">
           <button id="exportJson">Export backup (.json)</button>
           <button id="exportCsv" class="ghost">Export card ratings (.csv)</button>
+          <label>When backup assessments differ
+            <select id="importPolicy">
+              <option value="existing">Keep existing assessments</option>
+              <option value="backup">Use backup assessments</option>
+            </select>
+          </label>
           <label class="file-button">Import backup<input id="importJson" type="file" accept=".json,application/json"></label>
+          <button id="exportRecovery" class="ghost">Export backup from before last import</button>
         </div>
-        <p class="muted">17Lands history and expert comparisons will be added here after the grading workflow is validated. The data model already keeps each set separate.</p>
+        <p class="muted">Imports add missing sets and cards. Your choice above applies to whole card and mechanic assessments, including notes and tags. Export a backup before importing. Expert and 17Lands comparisons are handled in your spreadsheet.</p>
       </div>
     </div>
   </section>
@@ -142,6 +150,6 @@
   <img id="modalCardImage" alt="Enlarged Magic card">
 </div>
 
-<script src="./app.js?v=1.4"></script>
+<script src="./app.js?v=1.5"></script>
 </body>
 </html>

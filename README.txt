@@ -1,3 +1,16 @@
+MTG Limited Grader v1.5
+
+Fixes saving unopened/stale forms over another card. Fields now save as edited;
+gallery badges refresh after grading. Backup imports validate and combine sets,
+keep existing assessments by default, and offer explicit conflict replacement.
+Data can export the automatic recovery copy from before the last import.
+Unreadable saved data is never silently reset. Save failures remain visible.
+Existing grading scales, defaults, storage key, and CSV columns are preserved.
+
+Development: node --test tests/reliability.test.cjs
+Optional private fixture: set MTG_TEST_BACKUP to the absolute JSON backup path.
+See docs/reliability-update.md and docs/validation.md for behavior and checks.
+
 MTG Limited Grader v1.4
 
 Changes: Reality Fracture/new-set import fallback; clearer Scryfall errors; preserves v1.3 cache/update behavior.

@@ -1,5 +1,5 @@
-const CACHE="limited-grader-v1-4";
-const SHELL=["./","./index.html","./styles.css?v=1.4","./app.js?v=1.4","./manifest.webmanifest?v=1.4"];
+const CACHE="limited-grader-v1-5";
+const SHELL=["./","./index.html","./styles.css?v=1.5","./app.js?v=1.5","./manifest.webmanifest?v=1.5"];
 self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).catch(()=>{}))});
 self.addEventListener("activate",e=>e.waitUntil((async()=>{
   const keys=await caches.keys();
